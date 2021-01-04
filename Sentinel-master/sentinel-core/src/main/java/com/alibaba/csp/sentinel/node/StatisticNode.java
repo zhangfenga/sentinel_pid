@@ -225,9 +225,10 @@ public class StatisticNode implements Node {
     public double avgRt() {
         long successCount = rollingCounterInSecond.success();
         if (successCount == 0) {
+            // 说明当前在这两个时间窗口内没有请求通过
             return 0;
         }
-
+        // 返回每次成功请求的平均时间
         return rollingCounterInSecond.rt() * 1.0 / successCount;
     }
 

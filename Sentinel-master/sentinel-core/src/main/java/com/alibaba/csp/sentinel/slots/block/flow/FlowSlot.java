@@ -160,6 +160,7 @@ public class FlowSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
                       boolean prioritized, Object... args) throws Throwable {
         checkFlow(resourceWrapper, context, node, count, prioritized);
 
+        //递归调用，核心方法在checkFlow中
         fireEntry(context, resourceWrapper, node, count, prioritized, args);
     }
 
@@ -177,7 +178,9 @@ public class FlowSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
         @Override
         public Collection<FlowRule> apply(String resource) {
             // Flow rule map should not be null.
+            //从流量规则处理器的缓存中获取设置好的流量规则
             Map<String, List<FlowRule>> flowRules = FlowRuleManager.getFlowRuleMap();
+            //返回这个资源path对应的规则
             return flowRules.get(resource);
         }
     };

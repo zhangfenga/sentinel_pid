@@ -267,8 +267,16 @@ public class FlowControllerV1 {
         return Result.ofSuccess(id);
     }
 
+    /**
+     * 发布规则
+     * @param app
+     * @param ip
+     * @param port
+     * @return
+     */
     private boolean publishRules(String app, String ip, Integer port) {
         List<FlowRuleEntity> rules = repository.findAllByMachine(MachineInfo.of(app, ip, port));
+        //给相应的sentinelApiClient设置对应的规则
         return sentinelApiClient.setFlowRuleOfMachine(app, ip, port, rules);
     }
 }

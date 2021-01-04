@@ -110,6 +110,7 @@ public class WarmUpController implements TrafficShapingController {
         return canPass(node, acquireCount, false);
     }
 
+    // 冷启动
     @Override
     public boolean canPass(Node node, int acquireCount, boolean prioritized) {
         long passQps = (long) node.passQps();

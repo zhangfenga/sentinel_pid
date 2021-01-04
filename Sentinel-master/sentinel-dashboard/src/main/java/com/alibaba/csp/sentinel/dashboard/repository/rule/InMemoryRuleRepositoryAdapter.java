@@ -46,6 +46,7 @@ public abstract class InMemoryRuleRepositoryAdapter<T extends RuleEntity> implem
         }
         T processedEntity = preProcess(entity);
         if (processedEntity != null) {
+            //把规则放在所有规则的缓存中
             allRules.put(processedEntity.getId(), processedEntity);
             machineRules.computeIfAbsent(MachineInfo.of(processedEntity.getApp(), processedEntity.getIp(),
                 processedEntity.getPort()), e -> new ConcurrentHashMap<>(32))

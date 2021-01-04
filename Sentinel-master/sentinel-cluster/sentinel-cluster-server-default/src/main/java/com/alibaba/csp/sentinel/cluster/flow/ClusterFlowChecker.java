@@ -38,10 +38,13 @@ final class ClusterFlowChecker {
     private static double calcGlobalThreshold(FlowRule rule) {
         double count = rule.getCount();
         switch (rule.getClusterConfig().getThresholdType()) {
+            //如果是集群模式
             case ClusterRuleConstant.FLOW_THRESHOLD_GLOBAL:
                 return count;
+                //如果是单机模式
             case ClusterRuleConstant.FLOW_THRESHOLD_AVG_LOCAL:
             default:
+                //获取这个规则对应的命名空间有多少连接
                 int connectedCount = ClusterFlowRuleManager.getConnectedCount(rule.getClusterConfig().getFlowId());
                 return count * connectedCount;
         }
@@ -64,8 +67,11 @@ final class ClusterFlowChecker {
             return new TokenResult(TokenResultStatus.FAIL);
         }
 
+        //每秒最后通过的qps
         double latestQps = metric.getAvg(ClusterFlowEvent.PASS);
+        //这个规则所能通过的所有qps(先判断是单机还是集群，然后乘以配置上的qps等于一共能通过多少qps)
         double globalThreshold = calcGlobalThreshold(rule) * ClusterServerConfigManager.getExceedCount();
+        //剩余的请求数
         double nextRemaining = globalThreshold - latestQps - acquireCount;
 
         if (nextRemaining >= 0) {
@@ -83,8 +89,12 @@ final class ClusterFlowChecker {
         } else {
             if (prioritized) {
                 // Try to occupy incoming buckets.
+                //试着占领进入的桶
+                //获取正在等待进入下一次桶的平均请求
                 double occupyAvg = metric.getAvg(ClusterFlowEvent.WAITING);
+                //如果这个值小于等于下一个时间段内可以请求通过的最大值
                 if (occupyAvg <= ClusterServerConfigManager.getMaxOccupyRatio() * globalThreshold) {
+                    //就让这些请求通过
                     int waitInMs = metric.tryOccupyNext(ClusterFlowEvent.PASS, acquireCount, globalThreshold);
                     // waitInMs > 0 indicates pre-occupy incoming buckets successfully.
                     if (waitInMs > 0) {
@@ -97,6 +107,7 @@ final class ClusterFlowChecker {
                 }
             }
             // Blocked.
+            //阻塞
             metric.add(ClusterFlowEvent.BLOCK, acquireCount);
             metric.add(ClusterFlowEvent.BLOCK_REQUEST, 1);
             ClusterServerStatLogUtil.log("flow|block|" + id, acquireCount);

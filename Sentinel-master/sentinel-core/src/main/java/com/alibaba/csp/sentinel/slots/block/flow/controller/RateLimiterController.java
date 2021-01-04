@@ -56,21 +56,29 @@ public class RateLimiterController implements TrafficShapingController {
 
         long currentTime = TimeUtil.currentTimeMillis();
         // Calculate the interval between every two requests.
+        //计算每两个请求之间的间隔
+        // 计算每 2 个请求之间的间隔，比如 QPS 限制为 10，那么间隔就是 100ms
         long costTime = Math.round(1.0 * (acquireCount) / count * 1000);
 
         // Expected pass time of this request.
+        //下一个请求通过的预期时间=两个请求的时间间隔+上一个请求的花费时间
         long expectedTime = costTime + latestPassedTime.get();
 
         if (expectedTime <= currentTime) {
             // Contention may exist here, but it's okay.
+            // 如果下一个请求的预期通过时间小于当前时间，那么让这个请求通过
             latestPassedTime.set(currentTime);
             return true;
         } else {
             // Calculate the time to wait.
+            // 等待时间 = 间隔时间+最后一个请求执行完的时间-当前时间
             long waitTime = costTime + latestPassedTime.get() - TimeUtil.currentTimeMillis();
             if (waitTime > maxQueueingTimeMs) {
+                // 如果等待时间大于时间窗口，那么不让执行，直接返回false
                 return false;
             } else {
+                // 如果小于时间窗口
+                //
                 long oldTime = latestPassedTime.addAndGet(costTime);
                 try {
                     waitTime = oldTime - TimeUtil.currentTimeMillis();

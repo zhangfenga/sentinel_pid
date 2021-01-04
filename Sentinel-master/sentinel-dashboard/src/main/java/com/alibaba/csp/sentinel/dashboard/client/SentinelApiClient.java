@@ -248,6 +248,7 @@ public class SentinelApiClient {
             future.completeExceptionally(new IllegalArgumentException("Bad URL or command name"));
             return future;
         }
+        //组装请求路径
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append("http://");
         urlBuilder.append(ip).append(':').append(port).append('/').append(api);

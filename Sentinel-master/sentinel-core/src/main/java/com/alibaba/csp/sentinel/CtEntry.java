@@ -51,8 +51,10 @@ class CtEntry extends Entry {
         }
         this.parent = context.getCurEntry();
         if (parent != null) {
+            //拿不到父处理器，就初始化子处理器
             ((CtEntry)parent).child = this;
         }
+        //最后把处理器给到当前的处理器
         context.setCurEntry(this);
     }
 

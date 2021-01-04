@@ -60,7 +60,7 @@ public class ArrayMetric implements Metric {
     public long success() {
         data.currentWindow();
         long success = 0;
-
+        // 返回两个时间窗口里的请求成功rt累加的时间
         List<MetricBucket> list = data.values();
         for (MetricBucket window : list) {
             success += window.success();
@@ -131,6 +131,7 @@ public class ArrayMetric implements Metric {
     public long rt() {
         data.currentWindow();
         long rt = 0;
+        // 返回两个时间窗口里的请求成功rt累加的时间
         List<MetricBucket> list = data.values();
         for (MetricBucket window : list) {
             rt += window.rt();

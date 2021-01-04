@@ -82,6 +82,7 @@ public class CommonFilter implements Filter {
         Entry urlEntry = null;
 
         try {
+            //如果处理路径不为null或者""
             String target = FilterUtil.filterTarget(sRequest);
             // Clean and unify the URL.
             // For REST APIs, you have to clean the URL (e.g. `/foo/1` and `/foo/2` -> `/foo/:id`), or
@@ -93,6 +94,7 @@ public class CommonFilter implements Filter {
 
             // If you intend to exclude some URLs, you can convert the URLs to the empty string ""
             // in the UrlCleaner implementation.
+            //使用已注册的源解析器解析请求源
             if (!StringUtil.isEmpty(target)) {
                 // Parse the request origin using registered origin parser.
                 String origin = parseOrigin(sRequest);
@@ -101,6 +103,7 @@ public class CommonFilter implements Filter {
 
                 if (httpMethodSpecify) {
                     // Add HTTP method prefix if necessary.
+                    //如果需要，添加HTTP方法前缀
                     String pathWithHttpMethod = sRequest.getMethod().toUpperCase() + COLON + target;
                     urlEntry = SphU.entry(pathWithHttpMethod, ResourceTypeConstants.COMMON_WEB, EntryType.IN);
                 } else {

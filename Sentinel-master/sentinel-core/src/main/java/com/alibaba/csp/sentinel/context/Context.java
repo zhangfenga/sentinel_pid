@@ -68,6 +68,7 @@ public class Context {
 
     /**
      * Current processing entry.
+     * 当前处理的entry
      */
     private Entry curEntry;
 

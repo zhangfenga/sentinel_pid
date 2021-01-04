@@ -39,6 +39,8 @@ public class DefaultTokenService implements TokenService {
             return badRequest();
         }
         // The rule should be valid.
+        //获取规则
+        // 一个资源可以有很多条规则，限流、降级、qps、rt,根据对应关系取规则
         FlowRule rule = ClusterFlowRuleManager.getFlowRuleById(ruleId);
         if (rule == null) {
             return new TokenResult(TokenResultStatus.NO_RULE_EXISTS);

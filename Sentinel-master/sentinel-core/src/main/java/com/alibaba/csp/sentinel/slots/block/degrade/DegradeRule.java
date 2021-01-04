@@ -192,28 +192,39 @@ public class DegradeRule extends AbstractRule {
             return true;
         }
 
+        // rt规则
         if (grade == RuleConstant.DEGRADE_GRADE_RT) {
+            // 获取成功通过请求的平均时间
             double rt = clusterNode.avgRt();
+            // 如果平均时间小于配置的阈值
             if (rt < this.count) {
+                // 直接通过
                 passCount.set(0);
                 return true;
             }
 
             // Sentinel will degrade the service only if count exceeds.
+            // 走到这儿，说明平均请求时间大于了我们配置的阈值，
+            // 在一个时间窗口内只能有5次这样的请求通过
             if (passCount.incrementAndGet() < rtSlowRequestAmount) {
                 return true;
             }
         } else if (grade == RuleConstant.DEGRADE_GRADE_EXCEPTION_RATIO) {
+            // 异常比率
             double exception = clusterNode.exceptionQps();
+            // 成功比率
             double success = clusterNode.successQps();
+            // 总的qps
             double total = clusterNode.totalQps();
             // If total amount is less than minRequestAmount, the request will pass.
+            // 如果1秒内总请求小于5，直接返回true
             if (total < minRequestAmount) {
                 return true;
             }
 
             // In the same aligned statistic time window,
             // "success" (aka. completed count) = exception count + non-exception count (realSuccess)
+            // 这是真是成功的请求比率
             double realSuccess = success - exception;
             if (realSuccess <= 0 && exception < minRequestAmount) {
                 return true;
